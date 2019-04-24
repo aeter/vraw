@@ -31,24 +31,45 @@
       <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
           <div class="button-group">
-            <button class="primary tooltip shadowed" aria-label="New"><i class="fa
-                    fa-file"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Save" @click="download_image" download="image.png">
+            <button class="primary tooltip shadowed" aria-label="New"><i class="fa fa-file"></i></button>
+
+            <button class="primary tooltip shadowed" aria-label="Save" @click="download_image">
               <i class="fa fa-download"></i>
               <a href="#" id="downloader"></a>
             </button>
-            <button class="primary tooltip shadowed" aria-label="Pencil"><i class="fa fa-pencil-alt"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Brush"><i class="fa fa-paint-brush"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Paint with hand"><i class="fa fa-hand-point-up"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Paint with hand"><i class="fa fa-hand-pointer"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Fill"><i class="fa fa-paint-roller"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Fill"><i class="fa fa-fill-drip"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Circle"><i class="far fa-circle"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Square"><i class="far fa-square"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Line"><i class="fa fa-minus"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Eraser"><i class="fa fa-eraser"></i></button>
+
+            <button class="primary tooltip shadowed" aria-label="Brush" 
+              @click="selected = 'brush'" :class="selected == 'brush' ? 'secondary' : ''">
+              <i class="fa fa-paint-brush"></i>
+            </button>
+
+            <button class="primary tooltip shadowed" aria-label="Fill" 
+              @click="selected = 'fill'" :class="selected == 'fill' ? 'secondary' : ''">
+              <i class="fa fa-fill-drip"></i>
+            </button>
+
+            <button class="primary tooltip shadowed" aria-label="Circle"
+              @click="selected = 'circle'" :class="selected == 'circle' ? 'secondary' : ''">
+              <i class="far fa-circle"></i>
+            </button>
+
+            <button class="primary tooltip shadowed" aria-label="Square"
+              @click="selected = 'square'" :class="selected == 'square' ? 'secondary' : ''">
+              <i class="far fa-square"></i>
+            </button>
+
+            <button class="primary tooltip shadowed" aria-label="Line"
+              @click="selected = 'line'" :class="selected == 'line' ? 'secondary' : ''">
+              <i class="fa fa-minus"></i>
+            </button>
+
+            <button class="primary tooltip shadowed" aria-label="Eraser"
+              @click="selected = 'eraser'" :class="selected == 'eraser' ? 'secondary': ''">
+              <i class="fa fa-eraser"></i>
+            </button>
+
             <button class="primary tooltip shadowed" aria-label="Color">
-              <input class="tooltip shadowed" aria-label="Color" value="#ff0000" id="colorPicker" type="color"></input>
+              <input type="color" v-model="color" id="colorPicker"></input>
 			</button>
           </div>
         </div>
@@ -60,12 +81,12 @@
       </div>
     </div>
 
-    <!-- Start running your app -->
     <script>
       var app = new Vue({
         el: '#vraw_app',
         data: {
-
+          color: "#228B22",
+          selected: '',
         },
         methods: {
           download_image: function() {
