@@ -33,8 +33,10 @@
           <div class="button-group">
             <button class="primary tooltip shadowed" aria-label="New"><i class="fa
                     fa-file"></i></button>
-            <button class="primary tooltip shadowed" aria-label="Save"><i class="fa
-                    fa-download"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Save" @click="download_image" download="image.png">
+              <i class="fa fa-download"></i>
+              <a href="#" id="downloader"></a>
+            </button>
             <button class="primary tooltip shadowed" aria-label="Pencil"><i class="fa fa-pencil-alt"></i></button>
             <button class="primary tooltip shadowed" aria-label="Brush"><i class="fa fa-paint-brush"></i></button>
             <button class="primary tooltip shadowed" aria-label="Paint with hand"><i class="fa fa-hand-point-up"></i></button>
@@ -65,6 +67,14 @@
         data: {
 
         },
+        methods: {
+          download_image: function() {
+            var link = document.getElementById('downloader');
+            link.setAttribute('download', 'image.png');
+            link.setAttribute('href', document.getElementById('vraw_canvas').toDataURL("image/png").replace("image/png", "image/octet-stream"));
+            link.click();
+          }
+        }
       })
     </script>
   </body>
