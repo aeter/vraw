@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Vraw</title>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css">
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+
+    <style>
+      #colorPicker {
+        background-color: white;
+        padding: 5px;
+        border: none;
+		max-width: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="#" class="logo"><i class="fa fa-pencil-ruler"></i>&nbsp;Vraw</a>
+	  <a href="https://github.com/aeter/vraw" class="button"><i class="fa fa-code-branch"></i>&nbsp;Github</a>
+    </header>
+    <div class="container" id="vraw_app">
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <div class="button-group">
+            <button class="primary tooltip shadowed" aria-label="New"><i class="fa
+                    fa-file"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Save"><i class="fa
+                    fa-download"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Pencil"><i class="fa fa-pencil-alt"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Brush"><i class="fa fa-paint-brush"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Paint with hand"><i class="fa fa-hand-point-up"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Paint with hand"><i class="fa fa-hand-pointer"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Fill"><i class="fa fa-paint-roller"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Fill"><i class="fa fa-fill-drip"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Circle"><i class="far fa-circle"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Square"><i class="far fa-square"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Line"><i class="fa fa-minus"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Eraser"><i class="fa fa-eraser"></i></button>
+            <button class="primary tooltip shadowed" aria-label="Color">
+              <input class="tooltip shadowed" aria-label="Color" value="#ff0000" id="colorPicker" type="color"></input>
+			</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <canvas id="vraw_canvas" width="780" height="600" style="border:1px solid gray;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start running your app -->
+    <script>
+      var app = new Vue({
+        el: '#vraw_app',
+        data: {
+
+        },
+      })
+    </script>
+  </body>
+</html>
