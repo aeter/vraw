@@ -40,7 +40,10 @@
       <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
           <div class="button-group">
-            <button class="primary tooltip shadowed" aria-label="New"><i class="fa fa-file"></i></button>
+            <button class="primary tooltip shadowed" aria-label="New"
+              @click="clear">
+              <i class="fa fa-file"></i>
+            </button>
 
             <button class="primary tooltip shadowed" aria-label="Save" @click="download_image">
               <i class="fa fa-download"></i>
@@ -126,6 +129,9 @@
           }
         },
         methods: {
+          clear: function() {
+            this.elements = [];
+          },
           download_image: function() {
             var link = document.getElementById('downloader');
             link.setAttribute('download', 'image.png');
