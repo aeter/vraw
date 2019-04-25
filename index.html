@@ -24,10 +24,10 @@
         border: 1px solid gray; 
       }
       .cursor-brush {
-        cursor: url(vendor/icons/font_awesome/paint-brush.svg), auto;
+        cursor: url(vendor/icons/font_awesome/paint-brush.svg) 0 32, auto;
       }
       .cursor-eraser {
-        cursor: url(vendor/icons/font_awesome/eraser.svg), auto;
+        cursor: url(vendor/icons/font_awesome/eraser.svg) 0 32, auto;
       }
     </style>
   </head>
@@ -117,6 +117,7 @@
               if (element.type == "line" && element.end !== undefined) {
                 context.beginPath();
                 context.strokeStyle = element.color;
+                context.lineWidth = 5;
                 context.moveTo(element.start.x, element.start.y);
                 context.lineTo(element.end.x, element.end.y);
                 context.stroke();
