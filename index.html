@@ -86,7 +86,11 @@
       <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
           <canvas id="vraw_canvas" width="780" height="600" 
-            :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'">
+            :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'"
+            @mousedown="handle_mousedown"
+            @mousemove="handle_mousemove"
+            @mouseout="handle_mouseout"
+            @mouseup="handle_mouseup">
           </canvas>
         </div>
       </div>
@@ -98,7 +102,27 @@
         data: {
           color: "#228B22",
           selected: 'brush',
-          context: document.getElementById('vraw_canvas').getContext("2d"),
+          drawing: false,
+          elements: [],
+        },
+        watch: {
+          elements: function() {
+            var canvas = document.getElementById('vraw_canvas')
+            var context = canvas.getContext("2d");
+            // clear canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (var element of this.elements) {
+              // draw a line
+              if (element.type == "line" && element.end !== undefined) {
+                context.beginPath();
+                context.strokeStyle = element.color;
+                context.moveTo(element.start.x, element.start.y);
+                context.lineTo(element.end.x, element.end.y);
+                context.stroke();
+              }
+            }
+          }
         },
         methods: {
           download_image: function() {
@@ -107,7 +131,33 @@
             link.setAttribute('href', document.getElementById('vraw_canvas').toDataURL("image/png").replace("image/png", "image/octet-stream"));
             link.click();
           },
-        }
+          handle_mousedown: function(e) {
+            // drawing a line
+            if (this.selected == "line") {
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: "line", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
+            }
+          },
+          handle_mouseup: function(e) {
+            // drawing a line
+            if (this.selected == "line") {
+              var last_element = this.elements[this.elements.length - 1];
+              var cursor_position = this.getCursorPosition(e);
+              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
+              // because setting elements like x[a] = 5 is not supported by Vue
+              this.elements.pop();
+              this.elements.push(last_element);
+            }
+          },
+          handle_mousemove: function(e) {
+          },
+          handle_mouseout: function(e) {
+          },
+          getCursorPosition(e) {
+            var rect = document.getElementById('vraw_canvas').getBoundingClientRect();
+            return {x: e.clientX - rect.left, y: e.clientY - rect.top};
+          },
+        },
       })
     </script>
   </body>
