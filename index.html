@@ -20,6 +20,15 @@
         border: none;
 		max-width: 20px;
       }
+      #vraw_canvas { 
+        border: 1px solid gray; 
+      }
+      .cursor-brush {
+        cursor: url(vendor/icons/font_awesome/paint-brush.svg), auto;
+      }
+      .cursor-eraser {
+        cursor: url(vendor/icons/font_awesome/eraser.svg), auto;
+      }
     </style>
   </head>
   <body>
@@ -76,7 +85,9 @@
       </div>
       <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
-          <canvas id="vraw_canvas" width="780" height="600" style="border:1px solid gray;"></canvas>
+          <canvas id="vraw_canvas" width="780" height="600" 
+            :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'">
+          </canvas>
         </div>
       </div>
     </div>
@@ -86,7 +97,8 @@
         el: '#vraw_app',
         data: {
           color: "#228B22",
-          selected: '',
+          selected: 'brush',
+          context: document.getElementById('vraw_canvas').getContext("2d"),
         },
         methods: {
           download_image: function() {
@@ -94,7 +106,7 @@
             link.setAttribute('download', 'image.png');
             link.setAttribute('href', document.getElementById('vraw_canvas').toDataURL("image/png").replace("image/png", "image/octet-stream"));
             link.click();
-          }
+          },
         }
       })
     </script>
