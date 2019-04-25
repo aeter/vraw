@@ -106,6 +106,7 @@
           color: "#228B22",
           selected: 'brush',
           drawing_a_line: false,
+          erasing: false,
           elements: [],
         },
         watch: {
@@ -123,6 +124,11 @@
                 context.lineWidth = 5;
                 context.moveTo(element.start.x, element.start.y);
                 context.lineTo(element.end.x, element.end.y);
+                context.stroke();
+              }
+              if (element.type == "eraser") {
+                context.beginPath();
+                context.clearRect(element.position.x, element.position.y, 10, 10);
                 context.stroke();
               }
             }
@@ -145,10 +151,16 @@
               var cursor_position = this.getCursorPosition(e);
               this.elements.push({type: "line", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
             }
+            if (this.selected == "eraser") {
+              this.erasing = true;
+            }
           },
           handle_mouseup: function(e) {
             if (this.selected == "line") {
               this.drawing_a_line = false;
+            }
+            if (this.selected == "eraser") {
+              this.erasing = false;
             }
           },
           handle_mousemove: function(e) {
@@ -160,6 +172,10 @@
               // because setting elements like x[a] = 5 is not supported by Vue
               this.elements.pop();
               this.elements.push(last_element);
+            }
+            if (this.selected == "eraser" && this.erasing) {
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: "eraser", position: {x: cursor_position.x, y: cursor_position.y}})
             }
           },
           handle_mouseout: function(e) {
