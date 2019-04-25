@@ -102,7 +102,7 @@
         data: {
           color: "#228B22",
           selected: 'brush',
-          drawing: false,
+          drawing_a_line: false,
           elements: [],
         },
         watch: {
@@ -135,13 +135,19 @@
           handle_mousedown: function(e) {
             // drawing a line
             if (this.selected == "line") {
+              this.drawing_a_line = true;
               var cursor_position = this.getCursorPosition(e);
               this.elements.push({type: "line", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
             }
           },
           handle_mouseup: function(e) {
-            // drawing a line
             if (this.selected == "line") {
+              this.drawing_a_line = false;
+            }
+          },
+          handle_mousemove: function(e) {
+            // drawing a line
+            if (this.selected == "line" && this.drawing_a_line) {
               var last_element = this.elements[this.elements.length - 1];
               var cursor_position = this.getCursorPosition(e);
               last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
@@ -150,9 +156,10 @@
               this.elements.push(last_element);
             }
           },
-          handle_mousemove: function(e) {
-          },
           handle_mouseout: function(e) {
+            if (this.selected == "line") {
+              this.drawing_a_line = false;
+            }
           },
           getCursorPosition(e) {
             var rect = document.getElementById('vraw_canvas').getBoundingClientRect();
