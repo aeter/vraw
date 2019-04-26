@@ -156,10 +156,10 @@
               }
               if (element.type == "circle" && element.end !== undefined) {
                 let centerX = (element.end.x + element.start.x) / 2;
-                let centerY = (element.end.y + element.start.y) / 2;
                 // we need Math.abs in case we're drawing the circle by
                 // dragging to the left (in which case the radius would be negative)
                 let radius = Math.abs((element.end.x - element.start.x) / 2);
+                let centerY = element.end.y > element.start.y ? element.start.y + radius : element.start.y - radius;
 
                 context.lineWidth = 5;
                 context.strokeStyle = element.color;
