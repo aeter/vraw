@@ -116,6 +116,7 @@
           selected: 'brush',
           drawing_a_line: false,
           drawing_a_rectangle: false,
+          drawing_a_circle: false,
           drawing_dots: false,
           erasing: false,
           elements: [],
@@ -153,6 +154,19 @@
                   element.end.x - element.start.x,
                   element.end.y - element.start.y)
               }
+              if (element.type == "circle" && element.end !== undefined) {
+                let centerX = (element.end.x + element.start.x) / 2;
+                let centerY = (element.end.y + element.start.y) / 2;
+                // we need Math.abs in case we're drawing the circle by
+                // dragging to the left (in which case the radius would be negative)
+                let radius = Math.abs((element.end.x - element.start.x) / 2);
+
+                context.lineWidth = 5;
+                context.strokeStyle = element.color;
+                context.beginPath();
+                context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                context.stroke();
+              }
             }
           }
         },
@@ -185,6 +199,11 @@
               var cursor_position = this.getCursorPosition(e);
               this.elements.push({type: "rectangle", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
             }
+            if (this.selected == "circle") {
+              this.drawing_a_circle = true;
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: "circle", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
+            }
           },
           handle_mouseup: function(e) {
             if (this.selected == "line") {
@@ -199,6 +218,9 @@
             if (this.selected == "rectangle") {
               this.drawing_a_rectangle = false;
             }
+            if (this.selected == "circle") {
+              this.drawing_a_circle = false;
+            }
           },
           handle_mousemove: function(e) {
             // drawing a line
@@ -211,6 +233,14 @@
               this.elements.push(last_element);
             }
             if (this.selected == "rectangle" && this.drawing_a_rectangle) {
+              var last_element = this.elements[this.elements.length - 1];
+              var cursor_position = this.getCursorPosition(e);
+              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
+              // because setting elements like x[a] = 5 is not supported by Vue
+              this.elements.pop();
+              this.elements.push(last_element);
+            }
+            if (this.selected == "circle" && this.drawing_a_circle) {
               var last_element = this.elements[this.elements.length - 1];
               var cursor_position = this.getCursorPosition(e);
               last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
@@ -233,6 +263,9 @@
             }
             if (this.selected == "rectangle") {
               this.drawing_a_rectangle = false;
+            }
+            if (this.selected == "circle") {
+              this.drawing_a_circle = false;
             }
           },
           getCursorPosition: function(e) {
