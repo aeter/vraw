@@ -118,6 +118,7 @@
           color: "#228B22",
           selected: 'brush',
           drawing_a_line: false,
+          drawing_a_square: false,
           drawing_dots: false,
           erasing: false,
           elements: [],
@@ -145,6 +146,15 @@
               if (element.type == "brush") {
                 context.fillStyle = element.color;
                 context.fillRect(element.position.x, element.position.y, 5, 5);
+              }
+              if (element.type == "square" && element.end !== undefined) {
+                context.lineWidth = 5;
+                context.strokeStyle = element.color;
+                context.strokeRect(
+                  element.start.x,
+                  element.start.y,
+                  element.end.x - element.start.x,
+                  element.end.y - element.start.y)
               }
             }
           }
@@ -174,6 +184,11 @@
               var cursor_position = this.getCursorPosition(e);
               this.elements.push({type: "brush", color: this.color, position: {x: cursor_position.x, y: cursor_position.y}});
             }
+            if (this.selected == "square") {
+              this.drawing_a_square = true;
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: "square", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
+            }
           },
           handle_mouseup: function(e) {
             if (this.selected == "line") {
@@ -185,10 +200,21 @@
             if (this.selected == "brush") {
               this.drawing_dots = false;
             }
+            if (this.selected == "square") {
+              this.drawing_a_square = false;
+            }
           },
           handle_mousemove: function(e) {
             // drawing a line
             if (this.selected == "line" && this.drawing_a_line) {
+              var last_element = this.elements[this.elements.length - 1];
+              var cursor_position = this.getCursorPosition(e);
+              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
+              // because setting elements like x[a] = 5 is not supported by Vue
+              this.elements.pop();
+              this.elements.push(last_element);
+            }
+            if (this.selected == "square" && this.drawing_a_square) {
               var last_element = this.elements[this.elements.length - 1];
               var cursor_position = this.getCursorPosition(e);
               last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
@@ -208,6 +234,9 @@
           handle_mouseout: function(e) {
             if (this.selected == "line") {
               this.drawing_a_line = false;
+            }
+            if (this.selected == "square") {
+              this.drawing_a_square = false;
             }
           },
           getCursorPosition: function(e) {
