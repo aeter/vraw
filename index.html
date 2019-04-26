@@ -84,6 +84,11 @@
               <i class="fa fa-search"></i>
             </button>
 
+            <button class="primary tooltip shadowed" aria-label="Undo"
+              @click="undo">
+              <i class="fa fa-undo"></i>
+            </button>
+
             <button class="primary tooltip shadowed" aria-label="Color">
               <input type="color" v-model="color" id="colorPicker"></input>
 			</button>
@@ -104,6 +109,9 @@
     </div>
 
     <script>
+      // TODO - apply undo on color changes
+      // TODO - color picker activate on clicking on the blue area of the color
+      //        picker button
       var app = new Vue({
         el: '#vraw_app',
         data: {
@@ -202,9 +210,12 @@
               this.drawing_a_line = false;
             }
           },
-          getCursorPosition(e) {
+          getCursorPosition: function(e) {
             var rect = document.getElementById('vraw_canvas').getBoundingClientRect();
             return {x: e.clientX - rect.left, y: e.clientY - rect.top};
+          },
+          undo: function(e) {
+            this.elements.pop();
           },
         },
       })
