@@ -65,8 +65,8 @@
               <i class="far fa-circle"></i>
             </button>
 
-            <button class="primary tooltip shadowed" aria-label="Square"
-              @click="selected = 'square'" :class="selected == 'square' ? 'secondary' : ''">
+            <button class="primary tooltip shadowed" aria-label="Rectangle"
+              @click="selected = 'rectangle'" :class="selected == 'rectangle' ? 'secondary' : ''">
               <i class="far fa-square"></i>
             </button>
 
@@ -78,10 +78,6 @@
             <button class="primary tooltip shadowed" aria-label="Eraser"
               @click="selected = 'eraser'" :class="selected == 'eraser' ? 'secondary': ''">
               <i class="fa fa-eraser"></i>
-            </button>
-
-            <button class="primary tooltip shadowed" aria-label="Zoom">
-              <i class="fa fa-search"></i>
             </button>
 
             <button class="primary tooltip shadowed" aria-label="Undo"
@@ -98,6 +94,7 @@
       <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
           <canvas id="vraw_canvas" width="780" height="600" 
+            ref="vraw_canvas"
             :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'"
             @mousedown="handle_mousedown"
             @mousemove="handle_mousemove"
@@ -118,14 +115,14 @@
           color: "#228B22",
           selected: 'brush',
           drawing_a_line: false,
-          drawing_a_square: false,
+          drawing_a_rectangle: false,
           drawing_dots: false,
           erasing: false,
           elements: [],
         },
         watch: {
           elements: function() {
-            var canvas = document.getElementById('vraw_canvas')
+            var canvas = this.$refs.vraw_canvas;
             var context = canvas.getContext("2d");
             // clear canvas
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -147,7 +144,7 @@
                 context.fillStyle = element.color;
                 context.fillRect(element.position.x, element.position.y, 5, 5);
               }
-              if (element.type == "square" && element.end !== undefined) {
+              if (element.type == "rectangle" && element.end !== undefined) {
                 context.lineWidth = 5;
                 context.strokeStyle = element.color;
                 context.strokeRect(
@@ -166,11 +163,10 @@
           download_image: function() {
             var link = document.getElementById('downloader');
             link.setAttribute('download', 'image.png');
-            link.setAttribute('href', document.getElementById('vraw_canvas').toDataURL("image/png").replace("image/png", "image/octet-stream"));
+            link.setAttribute('href', this.$refs.vraw_canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
             link.click();
           },
           handle_mousedown: function(e) {
-            // drawing a line
             if (this.selected == "line") {
               this.drawing_a_line = true;
               var cursor_position = this.getCursorPosition(e);
@@ -184,10 +180,10 @@
               var cursor_position = this.getCursorPosition(e);
               this.elements.push({type: "brush", color: this.color, position: {x: cursor_position.x, y: cursor_position.y}});
             }
-            if (this.selected == "square") {
-              this.drawing_a_square = true;
+            if (this.selected == "rectangle") {
+              this.drawing_a_rectangle = true;
               var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "square", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
+              this.elements.push({type: "rectangle", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
             }
           },
           handle_mouseup: function(e) {
@@ -200,8 +196,8 @@
             if (this.selected == "brush") {
               this.drawing_dots = false;
             }
-            if (this.selected == "square") {
-              this.drawing_a_square = false;
+            if (this.selected == "rectangle") {
+              this.drawing_a_rectangle = false;
             }
           },
           handle_mousemove: function(e) {
@@ -214,7 +210,7 @@
               this.elements.pop();
               this.elements.push(last_element);
             }
-            if (this.selected == "square" && this.drawing_a_square) {
+            if (this.selected == "rectangle" && this.drawing_a_rectangle) {
               var last_element = this.elements[this.elements.length - 1];
               var cursor_position = this.getCursorPosition(e);
               last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
@@ -235,12 +231,12 @@
             if (this.selected == "line") {
               this.drawing_a_line = false;
             }
-            if (this.selected == "square") {
-              this.drawing_a_square = false;
+            if (this.selected == "rectangle") {
+              this.drawing_a_rectangle = false;
             }
           },
           getCursorPosition: function(e) {
-            var rect = document.getElementById('vraw_canvas').getBoundingClientRect();
+            var rect = this.$refs.vraw_canvas.getBoundingClientRect();
             return {x: e.clientX - rect.left, y: e.clientY - rect.top};
           },
           undo: function(e) {
