@@ -1,5 +1,5 @@
-# vraw
+[DEMO :arrow_upper_right:](https://aeter.github.io/vraw/)
 
-[WIP] :mushroom: :closed_lock_with_key: :fax: :ghost:
+---
 
-A drawing app, showcasing [Mini CSS](https://minicss.org/), [Vue JS](https://vuejs.org/), [Font Awesome](https://fontawesome.com)
+A drawing app, showcasing [Vue JS](https://vuejs.org/) and also [Mini CSS](https://minicss.org/) and [Font Awesome](https://fontawesome.com)
