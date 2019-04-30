@@ -106,25 +106,83 @@
     </div>
 
     <script>
-      // TODO - apply undo on color changes
-      // TODO - color picker activate on clicking on the blue area of the color
-      //        picker button
       var app = new Vue({
         el: '#vraw_app',
         data: {
           color: "#228B22",
           selected: 'brush',
-          drawing_a_line: false,
-          drawing_a_rectangle: false,
-          drawing_a_circle: false,
-          drawing_dots: false,
+          drawing: false,
           erasing: false,
           elements: [],
         },
+        methods: {
+          clear: function() {
+            this.elements = [];
+          },
+          download_image: function() {
+            var link = document.getElementById('downloader');
+            link.setAttribute('download', 'image.png');
+            link.setAttribute('href', this.$refs.vraw_canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+            link.click();
+          },
+          handle_mousedown: function(e) {
+            if (this.selected == "line" || this.selected == "rectangle" ||
+                this.selected == "circle") {
+              this.drawing = true;
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: this.selected, color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
+            }
+            if (this.selected == "brush") {
+              this.drawing = true;
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: this.selected, color: this.color, position: {x: cursor_position.x, y: cursor_position.y}});
+            }
+            if (this.selected == "eraser") {
+              this.erasing = true;
+            }
+          },
+          handle_mousemove: function(e) {
+            if ((this.selected == "line" && this.drawing) ||
+                (this.selected == "rectangle" && this.drawing) ||
+                (this.selected == "circle" && this.drawing)) {
+              var last_element = this.elements[this.elements.length - 1];
+              var cursor_position = this.getCursorPosition(e);
+              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
+              Vue.set(this.elements, this.elements.length - 1, last_element)
+            }
+            if (this.selected == "brush" && this.drawing) {
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: "brush", color: this.color, position: {x: cursor_position.x, y: cursor_position.y}});
+            }
+            if (this.selected == "eraser" && this.erasing) {
+              var cursor_position = this.getCursorPosition(e);
+              this.elements.push({type: "eraser", position: {x: cursor_position.x, y: cursor_position.y}})
+            }
+          },
+          handle_mouseout: function(e) {
+            this.drawing = false;
+            this.erasing = false;
+          },
+          handle_mouseup: function(e) {
+            this.erasing = false;
+            this.drawing = false;
+          },
+          getCursorPosition: function(e) {
+            var rect = this.$refs.vraw_canvas.getBoundingClientRect();
+            return {x: e.clientX - rect.left, y: e.clientY - rect.top};
+          },
+          undo: function(e) {
+            this.elements.pop();
+          },
+        },
         watch: {
           elements: function() {
+            // ----------------------------------------------------------------
+            // on change of this.elements, clears canvas and redraws everything:
+            // ----------------------------------------------------------------
             var canvas = this.$refs.vraw_canvas;
             var context = canvas.getContext("2d");
+
             // clear canvas
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -138,13 +196,16 @@
                 context.lineTo(element.end.x, element.end.y);
                 context.stroke();
               }
+              // erase
               if (element.type == "eraser") {
                 context.clearRect(element.position.x, element.position.y, 10, 10);
               }
+              // draw dots with brush
               if (element.type == "brush") {
                 context.fillStyle = element.color;
                 context.fillRect(element.position.x, element.position.y, 5, 5);
               }
+              // draw a rectangle
               if (element.type == "rectangle" && element.end !== undefined) {
                 context.lineWidth = 5;
                 context.strokeStyle = element.color;
@@ -154,6 +215,7 @@
                   element.end.x - element.start.x,
                   element.end.y - element.start.y)
               }
+              // draw a circle
               if (element.type == "circle" && element.end !== undefined) {
                 let centerX = (element.end.x + element.start.x) / 2;
                 // we need Math.abs in case we're drawing the circle by
@@ -169,112 +231,6 @@
               }
             }
           }
-        },
-        methods: {
-          clear: function() {
-            this.elements = [];
-          },
-          download_image: function() {
-            var link = document.getElementById('downloader');
-            link.setAttribute('download', 'image.png');
-            link.setAttribute('href', this.$refs.vraw_canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
-            link.click();
-          },
-          handle_mousedown: function(e) {
-            if (this.selected == "line") {
-              this.drawing_a_line = true;
-              var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "line", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
-            }
-            if (this.selected == "eraser") {
-              this.erasing = true;
-            }
-            if (this.selected == "brush") {
-              this.drawing_dots = true;
-              var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "brush", color: this.color, position: {x: cursor_position.x, y: cursor_position.y}});
-            }
-            if (this.selected == "rectangle") {
-              this.drawing_a_rectangle = true;
-              var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "rectangle", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
-            }
-            if (this.selected == "circle") {
-              this.drawing_a_circle = true;
-              var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "circle", color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
-            }
-          },
-          handle_mouseup: function(e) {
-            if (this.selected == "line") {
-              this.drawing_a_line = false;
-            }
-            if (this.selected == "eraser") {
-              this.erasing = false;
-            }
-            if (this.selected == "brush") {
-              this.drawing_dots = false;
-            }
-            if (this.selected == "rectangle") {
-              this.drawing_a_rectangle = false;
-            }
-            if (this.selected == "circle") {
-              this.drawing_a_circle = false;
-            }
-          },
-          handle_mousemove: function(e) {
-            // drawing a line
-            if (this.selected == "line" && this.drawing_a_line) {
-              var last_element = this.elements[this.elements.length - 1];
-              var cursor_position = this.getCursorPosition(e);
-              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
-              // because setting elements like x[a] = 5 is not supported by Vue
-              this.elements.pop();
-              this.elements.push(last_element);
-            }
-            if (this.selected == "rectangle" && this.drawing_a_rectangle) {
-              var last_element = this.elements[this.elements.length - 1];
-              var cursor_position = this.getCursorPosition(e);
-              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
-              // because setting elements like x[a] = 5 is not supported by Vue
-              this.elements.pop();
-              this.elements.push(last_element);
-            }
-            if (this.selected == "circle" && this.drawing_a_circle) {
-              var last_element = this.elements[this.elements.length - 1];
-              var cursor_position = this.getCursorPosition(e);
-              last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
-              // because setting elements like x[a] = 5 is not supported by Vue
-              this.elements.pop();
-              this.elements.push(last_element);
-            }
-            if (this.selected == "eraser" && this.erasing) {
-              var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "eraser", position: {x: cursor_position.x, y: cursor_position.y}})
-            }
-            if (this.selected == "brush" && this.drawing_dots) {
-              var cursor_position = this.getCursorPosition(e);
-              this.elements.push({type: "brush", color: this.color, position: {x: cursor_position.x, y: cursor_position.y}});
-            }
-          },
-          handle_mouseout: function(e) {
-            if (this.selected == "line") {
-              this.drawing_a_line = false;
-            }
-            if (this.selected == "rectangle") {
-              this.drawing_a_rectangle = false;
-            }
-            if (this.selected == "circle") {
-              this.drawing_a_circle = false;
-            }
-          },
-          getCursorPosition: function(e) {
-            var rect = this.$refs.vraw_canvas.getBoundingClientRect();
-            return {x: e.clientX - rect.left, y: e.clientY - rect.top};
-          },
-          undo: function(e) {
-            this.elements.pop();
-          },
         },
       })
     </script>
