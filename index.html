@@ -11,14 +11,13 @@
     <link rel="stylesheet" href="vendor/mini.css.3.0.1.min.css">
 
     <script src="vendor/vue.2.6.10.min.js"></script>
-    <script src="vendor/babel-polyfill.6.26.0.min.js"></script>
 
     <style>
       #colorPicker {
         background-color: white;
         padding: 5px;
         border: none;
-		max-width: 20px;
+        max-width: 20px;
       }
       #vraw_canvas { 
         border: 1px solid gray; 
@@ -34,7 +33,7 @@
   <body>
     <header>
       <a href="#" class="logo"><i class="fa fa-pencil-ruler"></i>&nbsp;Vraw</a>
-	  <a href="https://github.com/aeter/vraw" class="button"><i class="fa fa-code-branch"></i>&nbsp;Github</a>
+      <a href="https://github.com/aeter/vraw" class="button"><i class="fa fa-code-branch"></i>&nbsp;Github</a>
     </header>
     <div class="container" id="vraw_app">
       <div class="row">
@@ -45,7 +44,8 @@
               <i class="fa fa-file"></i>
             </button>
 
-            <button class="primary tooltip shadowed" aria-label="Save" @click="download_image">
+            <button class="primary tooltip shadowed" aria-label="Save"
+              @click="download_image">
               <i class="fa fa-download"></i>
               <a href="#" id="downloader"></a>
             </button>
@@ -86,8 +86,10 @@
             </button>
 
             <button class="primary tooltip shadowed" aria-label="Color">
-              <input type="color" v-model="color" id="colorPicker"></input>
-			</button>
+              <input type="color" id="colorPicker"
+                v-model="color">
+              </input>
+            </button>
           </div>
         </div>
       </div>
