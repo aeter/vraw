@@ -142,6 +142,15 @@
             if (this.selected == "eraser") {
               this.erasing = true;
             }
+            if (this.selected == "fill") {
+              var cursor_position = this.getCursorPosition(e);
+              var canvas = this.$refs.vraw_canvas;
+              var context = canvas.getContext("2d");
+              var image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+              var new_image_data = new PaintBucket(
+                cursor_position, image_data, canvas.width).colored_image_data();
+              context.putImageData(new_image_data, 0, 0);
+            }
           },
           handle_mousemove: function(e) {
             if ((this.selected == "line" && this.drawing) ||
@@ -235,6 +244,18 @@
           }
         },
       })
+
+      class PaintBucket {
+        constructor(cursor_position, image_data,  canvas_width) {
+          this.canvas_width = canvas_width;
+          this.image_data = image_data;
+          this.start_pixel_index = (canvas_width * cursor_position.x) + cursor_position.y;
+        }
+
+        colored_image_data() {
+          return this.image_data;
+        }
+      }
     </script>
   </body>
 </html>
