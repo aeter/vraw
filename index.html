@@ -94,11 +94,21 @@
               v-model="color">
             </input>
           </button>
+
+          <select v-model="dimensions">
+            <option>200x200</option>
+            <option>400x300</option>
+            <option>500x500</option>
+            <option>600x600</option>
+            <option>800x600</option>
+          </select>
         </div>
       </div>
       <div class="row">
-        <canvas id="vraw_canvas" width="780" height="600" 
+        <canvas id="vraw_canvas" 
           ref="vraw_canvas"
+          :width="dimensions.split('x')[0]"
+          :height="dimensions.split('x')[1]" 
           :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'"
           @mousedown="handle_mousedown"
           @mousemove="handle_mousemove"
@@ -117,6 +127,7 @@
           drawing: false,
           erasing: false,
           elements: [],
+          dimensions: "600x600",
         },
         methods: {
           clear: function() {
@@ -182,6 +193,7 @@
           },
         },
         watch: {
+          dimensions: function() { this.clear() },
           elements: function() {
             // ----------------------------------------------------------------
             // on change of this.elements, clears canvas and redraws everything:
