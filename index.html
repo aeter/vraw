@@ -37,73 +37,74 @@
     </header>
     <div class="container" id="vraw_app">
       <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-          <div class="button-group">
-            <button class="primary tooltip shadowed" aria-label="New"
-              @click="clear">
-              <i class="fa fa-file"></i>
-            </button>
+        <div class="button-group">
+          <button class="primary tooltip shadowed" aria-label="New"
+            @click="clear">
+            <i class="fa fa-file"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Save"
-              @click="download_image">
-              <i class="fa fa-download"></i>
-              <a href="#" id="downloader"></a>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Save"
+            @click="download_image">
+            <i class="fa fa-download"></i>
+            <a href="#" id="downloader"></a>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Brush" 
-              @click="selected = 'brush'" :class="selected == 'brush' ? 'secondary' : ''">
-              <i class="fa fa-paint-brush"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Brush" 
+            @click="selected = 'brush'" :class="selected == 'brush' ? 'secondary' : ''">
+            <i class="fa fa-paint-brush"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Fill" 
-              @click="selected = 'fill'" :class="selected == 'fill' ? 'secondary' : ''">
-              <i class="fa fa-fill-drip"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Circle"
+            @click="selected = 'circle'" :class="selected == 'circle' ? 'secondary' : ''">
+            <i class="far fa-circle"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Circle"
-              @click="selected = 'circle'" :class="selected == 'circle' ? 'secondary' : ''">
-              <i class="far fa-circle"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Circle (filled)"
+            @click="selected = 'filled_circle'" :class="selected == 'filled_circle' ? 'secondary' : ''">
+            <i class="fa fa-circle"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Rectangle"
-              @click="selected = 'rectangle'" :class="selected == 'rectangle' ? 'secondary' : ''">
-              <i class="far fa-square"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Rectangle"
+            @click="selected = 'rectangle'" :class="selected == 'rectangle' ? 'secondary' : ''">
+            <i class="far fa-square"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Line"
-              @click="selected = 'line'" :class="selected == 'line' ? 'secondary' : ''">
-              <i class="fa fa-minus"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Rectangle (filled)"
+            @click="selected = 'filled_rectangle'" :class="selected == 'filled_rectangle' ? 'secondary' : ''">
+            <i class="fa fa-square"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Eraser"
-              @click="selected = 'eraser'" :class="selected == 'eraser' ? 'secondary': ''">
-              <i class="fa fa-eraser"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Line"
+            @click="selected = 'line'" :class="selected == 'line' ? 'secondary' : ''">
+            <i class="fa fa-minus"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Undo"
-              @click="undo">
-              <i class="fa fa-undo"></i>
-            </button>
+          <button class="primary tooltip shadowed" aria-label="Eraser"
+            @click="selected = 'eraser'" :class="selected == 'eraser' ? 'secondary': ''">
+            <i class="fa fa-eraser"></i>
+          </button>
 
-            <button class="primary tooltip shadowed" aria-label="Color">
-              <input type="color" id="colorPicker"
-                v-model="color">
-              </input>
-            </button>
-          </div>
+          <button class="primary tooltip shadowed" aria-label="Undo"
+            @click="undo">
+            <i class="fa fa-undo"></i>
+          </button>
+
+          <button class="primary tooltip shadowed" aria-label="Color">
+            <input type="color" id="colorPicker"
+              v-model="color">
+            </input>
+          </button>
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-          <canvas id="vraw_canvas" width="780" height="600" 
-            ref="vraw_canvas"
-            :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'"
-            @mousedown="handle_mousedown"
-            @mousemove="handle_mousemove"
-            @mouseout="handle_mouseout"
-            @mouseup="handle_mouseup">
-          </canvas>
-        </div>
+        <canvas id="vraw_canvas" width="780" height="600" 
+          ref="vraw_canvas"
+          :class="selected == 'eraser' ? 'cursor-eraser' : 'cursor-brush'"
+          @mousedown="handle_mousedown"
+          @mousemove="handle_mousemove"
+          @mouseout="handle_mouseout"
+          @mouseup="handle_mouseup">
+        </canvas>
       </div>
     </div>
 
@@ -129,7 +130,8 @@
           },
           handle_mousedown: function(e) {
             if (this.selected == "line" || this.selected == "rectangle" ||
-                this.selected == "circle") {
+                this.selected == "filled_rectangle" ||
+                this.selected == "circle" || this.selected == "filled_circle") {
               this.drawing = true;
               var cursor_position = this.getCursorPosition(e);
               this.elements.push({type: this.selected, color: this.color, start: {x: cursor_position.x, y: cursor_position.y}})
@@ -142,20 +144,13 @@
             if (this.selected == "eraser") {
               this.erasing = true;
             }
-            if (this.selected == "fill") {
-              var cursor_position = this.getCursorPosition(e);
-              var canvas = this.$refs.vraw_canvas;
-              var context = canvas.getContext("2d");
-              var image_data = context.getImageData(0, 0, canvas.width, canvas.height);
-              var new_image_data = new PaintBucket(
-                cursor_position, image_data, canvas.width).colored_image_data();
-              context.putImageData(new_image_data, 0, 0);
-            }
           },
           handle_mousemove: function(e) {
             if ((this.selected == "line" && this.drawing) ||
                 (this.selected == "rectangle" && this.drawing) ||
-                (this.selected == "circle" && this.drawing)) {
+                (this.selected == "filled_rectangle" && this.drawing) ||
+                (this.selected == "circle" && this.drawing) ||
+                (this.selected == "filled_circle" && this.drawing)) {
               var last_element = this.elements[this.elements.length - 1];
               var cursor_position = this.getCursorPosition(e);
               last_element["end"] = {x: cursor_position.x, y: cursor_position.y};
@@ -226,6 +221,15 @@
                   element.end.x - element.start.x,
                   element.end.y - element.start.y)
               }
+              // draw a filled rectangle
+              if (element.type == "filled_rectangle" && element.end !== undefined) {
+                context.fillStyle = element.color;
+                context.fillRect(
+                  element.start.x,
+                  element.start.y,
+                  element.end.x - element.start.x,
+                  element.end.y - element.start.y)
+              }
               // draw a circle
               if (element.type == "circle" && element.end !== undefined) {
                 let centerX = (element.end.x + element.start.x) / 2;
@@ -240,22 +244,23 @@
                 context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
                 context.stroke();
               }
+              // draw a filled circle
+              if (element.type == "filled_circle" && element.end !== undefined) {
+                let centerX = (element.end.x + element.start.x) / 2;
+                // we need Math.abs in case we're drawing the circle by
+                // dragging to the left (in which case the radius would be negative)
+                let radius = Math.abs((element.end.x - element.start.x) / 2);
+                let centerY = element.end.y > element.start.y ? element.start.y + radius : element.start.y - radius;
+
+                context.fillStyle = element.color;
+                context.beginPath();
+                context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                context.fill();
+              }
             }
           }
         },
       })
-
-      class PaintBucket {
-        constructor(cursor_position, image_data,  canvas_width) {
-          this.canvas_width = canvas_width;
-          this.image_data = image_data;
-          this.start_pixel_index = (canvas_width * cursor_position.x) + cursor_position.y;
-        }
-
-        colored_image_data() {
-          return this.image_data;
-        }
-      }
     </script>
   </body>
 </html>
